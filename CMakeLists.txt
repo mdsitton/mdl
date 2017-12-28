@@ -9,10 +9,12 @@ endif()
 
 
 set(HEADERS
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/string.hpp)
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/string.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/timer.hpp)
 
 set(SOURCE
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/string.cpp)
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/string.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/timer.cpp)
 
 set(TEST_SOURCE
     ${CMAKE_CURRENT_SOURCE_DIR}/src/test/mdl_test.cpp)

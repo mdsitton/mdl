@@ -8,6 +8,9 @@ namespace mdl
 {
 
     size_t find_first(std::string_view str, char chr, size_t start = 0);
+    size_t find_first(std::string_view str, std::string_view chr, size_t start = 0);
+    size_t find_first_earlyexit(std::string_view str, std::string_view chr, size_t start = 0);
+    size_t find_first_old(std::string_view str, std::string_view chr, size_t start = 0);
 
     size_t find_last(std::string_view str, char chr, size_t start = std::string::npos);
 
