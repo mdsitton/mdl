@@ -1,22 +1,8 @@
 #include <string.hpp>
+#include <iostream>
 
 namespace mdl
 {
-
-    // Special case version of find for single 
-    size_t find_first(std::string_view str, char chr, size_t start)
-    {
-
-        auto str_d = str.data();
-        for (size_t i = start; i < str.size(); ++i)
-        {
-            if (str_d[i] == chr)
-            {
-                return i;
-            }
-        }
-        return std::string::npos;
-    }
 
     // This version of find, is essentially the same speed as the stl version.
     size_t find_first(std::string_view str, std::string_view chr, size_t start)
@@ -56,19 +42,6 @@ namespace mdl
         }
         return std::string::npos;
     }
-
-size_t find_first_old(std::string_view str, std::string_view chr, size_t start)
-{
-    size_t subSize = chr.size();
-    for (size_t i = start; i < str.size(); ++i)
-    {
-        if (str.substr(i, subSize) == chr)
-        {
-            return i;
-        }
-    }
-    return std::string::npos;
-}
 
     // This version of find, is essentially the same speed as the stl version.
     size_t find_first_earlyexit(std::string_view str, std::string_view chr, size_t start)
@@ -113,6 +86,8 @@ size_t find_first_old(std::string_view str, std::string_view chr, size_t start)
             for (size_t i = start; i < fulSize; ++i)
             {
                 // Fast exit for long strings.
+                // tbh this doesn't really change anything, it just shifts the problem from the first letter to the last :/
+                // But in some cases this seems to help for some reason? Weird...
                 if (str_d[i+subSize] != chr_d[subSize])
                 {
                     continue;
@@ -135,17 +110,33 @@ size_t find_first_old(std::string_view str, std::string_view chr, size_t start)
 
     }
 
-    size_t find_last(std::string_view str, char chr, size_t start)
+    size_t find_last(std::string_view str, std::string_view chr, size_t start)
     {
+        size_t subSize = chr.size();
+        size_t fulSize = str.size();
+
         if (start == std::string::npos)
         {
-            start = str.size()-1;
+            start = fulSize-subSize;
         }
-        for (size_t i = start; i >= 0; --i)
+
+        auto str_d = str.data();
+        auto chr_d = chr.data();
+
+        subSize--;
+
+        for (ssize_t i = start; i >= 0; --i)
         {
-            if (str[i] == chr)
+            for (size_t t = 0; t <= subSize; t++)
             {
-                return i;
+                if (str_d[i+t] != chr_d[t])
+                {
+                    break;
+                }
+                else if (t == subSize)
+                {
+                    return i;
+                }
             }
         }
         return std::string::npos;
@@ -153,15 +144,22 @@ size_t find_first_old(std::string_view str, std::string_view chr, size_t start)
 
     size_t find_first_not_in(std::string_view str, std::string_view collection, size_t start)
     {
+
+        auto str_d = str.data();
+        auto col_d = collection.data();
+
+        auto colSize = collection.size();
+        bool match;
+
         for (size_t i = start; i < str.size(); ++i)
         {
-            auto &chr = str[i];
-            bool match = false;
-            for (auto &item : collection)
+            match = false;
+            for (auto c = 0; c < colSize; ++c)
             {
-                if (chr == item)
+                if (str_d[i] == col_d[c])
                 {
                     match = true;
+                    break;
                 }
             }
             if (match != true)
@@ -240,36 +238,15 @@ size_t find_first_old(std::string_view str, std::string_view chr, size_t start)
         return output;
     }
 
-    std::vector<std::string> split(const std::string& str, const std::string& delimiter)
-    {
-        std::vector<std::string> split;
-
-        size_t start = 0;
-        size_t end = 0;
-        bool running = true;
-
-        while (running)
-        {
-            end = str.find(delimiter, start);
-            if (end == std::string::npos)
-            {
-                end = str.size();
-                running = false;
-            }
-            split.push_back(str.substr(start, end-start));
-            start = end + delimiter.size();
-        }
-
-        return split;
-    }
-
-    std::vector<std::string_view> split(std::string_view str, char delimiter)
+    std::vector<std::string_view> split(std::string_view str, std::string_view delimiter)
     {
         std::vector<std::string_view> split;
 
         size_t start = 0;
         size_t end = 0;
         bool running = true;
+
+        auto delSize = delimiter.size();
 
         while (running)
         {
@@ -280,7 +257,57 @@ size_t find_first_old(std::string_view str, std::string_view chr, size_t start)
                 running = false;
             }
             split.push_back(str.substr(start, end-start));
-            start = end + 1;
+            start = end + delSize;
+        }
+
+        return split;
+    }
+
+    std::vector<std::string_view> split2(std::string_view str, std::string_view delimiter)
+    {
+        std::vector<std::string_view> split;
+
+        size_t start = 0;
+        size_t end = 0;
+        bool running = true;
+
+        auto delSize = delimiter.size();
+
+        while (running)
+        {
+            end = find_first_earlyexit(str, delimiter, start);
+            if (end == std::string::npos)
+            {
+                end = str.size();
+                running = false;
+            }
+            split.push_back(str.substr(start, end-start));
+            start = end + delSize;
+        }
+
+        return split;
+    }
+
+    std::vector<std::string_view> split3(std::string_view str, std::string_view delimiter)
+    {
+        std::vector<std::string_view> split;
+
+        size_t start = 0;
+        size_t end = 0;
+        bool running = true;
+
+        auto delSize = delimiter.size();
+
+        while (running)
+        {
+            end = str.find(delimiter, start);
+            if (end == std::string::npos)
+            {
+                end = str.size();
+                running = false;
+            }
+            split.push_back(str.substr(start, end-start));
+            start = end + delSize;
         }
 
         return split;

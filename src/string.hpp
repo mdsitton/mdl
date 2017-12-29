@@ -6,13 +6,10 @@
 
 namespace mdl
 {
-
-    size_t find_first(std::string_view str, char chr, size_t start = 0);
     size_t find_first(std::string_view str, std::string_view chr, size_t start = 0);
     size_t find_first_earlyexit(std::string_view str, std::string_view chr, size_t start = 0);
-    size_t find_first_old(std::string_view str, std::string_view chr, size_t start = 0);
 
-    size_t find_last(std::string_view str, char chr, size_t start = std::string::npos);
+    size_t find_last(std::string_view str, std::string_view chr, size_t start = std::string::npos);
 
     size_t find_first_not_in(std::string_view str, std::string_view collection, size_t start = 0);
 
@@ -22,8 +19,9 @@ namespace mdl
 
     std::string join(const std::vector<std::string>& strElements, const std::string& delimiter);
 
-    std::vector<std::string> split(const std::string& str, const std::string& delimiter);
-    std::vector<std::string_view> split(std::string_view str, char delimiter);
+    std::vector<std::string_view> split(std::string_view str, std::string_view delimiter);
+    std::vector<std::string_view> split2(std::string_view str, std::string_view delimiter);
+    std::vector<std::string_view> split3(std::string_view str, std::string_view delimiter);
 
     std::string_view strip(std::string_view str);
 
